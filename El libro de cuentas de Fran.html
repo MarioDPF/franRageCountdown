@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El libro de cuentas de Fran</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3efff;--ink:#1b1340;--muted:#5b5280;--card:#ffffff;--line:#d9d0ff;
+  --a1:#ff4d6d;--a2:#7c3aed;--a3:#06b6d4;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0a24;--ink:#f4f0ff;--muted:#a79fd0;--card:#17113a;--line:#2e2566}}
+:root[data-theme="dark"]{--bg:#0e0a24;--ink:#f4f0ff;--muted:#a79fd0;--card:#17113a;--line:#2e2566}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif;min-height:100vh;
+  background-image:radial-gradient(60rem 30rem at 10% -10%,color-mix(in srgb,var(--a2) 22%,transparent),transparent),
+  radial-gradient(50rem 30rem at 100% 110%,color-mix(in srgb,var(--a1) 18%,transparent),transparent)}
+main{max-width:1100px;margin:0 auto;padding:3rem 1.25rem 4rem}
+h1{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:clamp(2rem,6vw,3.6rem);margin:0 0 .4rem;letter-spacing:-.03em}
+.sub{color:var(--muted);margin:0 0 2.5rem;font-size:1.05rem}
+.grid{display:grid;gap:1.5rem}
+.card{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:28px;padding:1.8rem 1.6rem 7rem;isolation:isolate}
+.card::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(135deg,color-mix(in srgb,var(--c) 14%,transparent),transparent 60%)}
+.title{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:clamp(1.4rem,4vw,2.2rem);line-height:1.1;margin:0 0 1.4rem;letter-spacing:-.02em;
+  color:var(--ink)}
+.title span{display:inline-block;white-space:pre;animation:bob 2.6s ease-in-out infinite,hue 3.2s ease-in-out infinite;animation-delay:calc(var(--i)*.08s),calc(var(--i)*.1s)}
+@keyframes hue{0%,100%{color:var(--ink);text-shadow:none}50%{color:var(--c);text-shadow:0 0 18px var(--c)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-.12em)}}
+.time{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;position:relative;z-index:2}
+.unit{text-align:center}
+.num{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:clamp(2.2rem,8vw,4.2rem);line-height:1;font-variant-numeric:tabular-nums}
+.lab{color:var(--muted);font-size:.9rem;margin-top:.3rem}
+.since{position:relative;z-index:2;color:var(--muted);font-size:.9rem;margin-top:1.2rem}
+.wave{position:absolute;left:0;bottom:0;width:100%;height:96px;z-index:1;pointer-events:none;overflow:hidden}
+.wave svg{position:absolute;bottom:0;left:0;width:200%;height:100%;fill:var(--c)}
+.w1{opacity:.28;animation:slide 9s linear infinite}
+.w2{opacity:.45;animation:slide 6s linear infinite reverse;height:78%!important}
+.w3{opacity:.8;animation:slide 4s linear infinite;height:55%!important}
+@keyframes slide{to{transform:translateX(-50%)}}
+.c1{--c:var(--a1);--d:#ffb347}
+.c2{--c:var(--a2);--d:#e879f9}
+.c3{--c:var(--a3);--d:#34d399}
+@media (min-width:900px){.grid{grid-template-columns:repeat(3,1fr)}.time{grid-template-columns:repeat(2,1fr);gap:1.2rem .8rem}}
+@media (prefers-reduced-motion:reduce){.title span,.wave svg{animation:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>El libro de cuentas de Fran</h1>
+  <p class="sub">Tiempo transcurrido desde la última vez, en directo.</p>
+  <div class="grid" id="grid"></div>
+</main>
+<script>
+const items=[
+  {t:"ultima vez que fran se picó",d:new Date(2026,9,24),c:"c1"},
+  {t:"ultima vez que fran fumbleó una mujer",d:new Date(2026,8,8),c:"c2"},
+  {t:"ultima mariconada de fran",d:new Date(2026,10,20),c:"c3"}
+];
+const P="M0 50 C100 10 200 90 300 50 S500 10 600 50 S800 90 900 50 S1100 10 1200 50 S1400 90 1500 50 S1700 10 1800 50 S2000 90 2100 50 S2300 10 2400 50 V100 H0Z";
+const wave=n=>`<svg class="w${n}" viewBox="0 0 2400 100" preserveAspectRatio="none" aria-hidden="true"><path d="${P}"/></svg>`;
+const fmt=new Intl.DateTimeFormat("es-ES",{day:"numeric",month:"long",year:"numeric"});
+const grid=document.getElementById("grid");
+grid.innerHTML=items.map((it,k)=>{
+  const title=[...it.t].map((ch,i)=>ch===" "?"<span style=\"display:inline-block;width:.3em\"></span>":`<span style="--i:${i}">${ch}</span>`).join("");
+  return `<section class="card ${it.c}">
+    <h2 class="title" aria-label="${it.t}">${title}</h2>
+    <div class="time" id="t${k}">
+      ${["días","horas","minutos","segundos"].map((l,j)=>`<div class="unit"><div class="num" data-u="${j}">00</div><div class="lab">${l}</div></div>`).join("")}
+    </div>
+    <div class="since">Desde el ${fmt.format(it.d)}</div>
+    <div class="wave">${wave(1)}${wave(2)}${wave(3)}</div>
+  </section>`;
+}).join("");
+const p2=n=>String(n).padStart(2,"0");
+function tick(){
+  const now=Date.now();
+  items.forEach((it,k)=>{
+    let s=Math.max(0,Math.floor((now-it.d.getTime())/1000));
+    const v=[Math.floor(s/86400),Math.floor(s%86400/3600),Math.floor(s%3600/60),s%60];
+    document.querySelectorAll(`#t${k} .num`).forEach((el,i)=>{el.textContent=i===0?String(v[i]):p2(v[i])});
+  });
+}
+tick();setInterval(tick,1000);
+</script>
+</body>
+</html>
